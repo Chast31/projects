@@ -16,8 +16,23 @@ async function getRawBody(req) {
 }
 
 export default async function handler(req, res) {
+  // ----------------------------------------
+  // 1) Manejo de GET para el proxy de Shopify
+  // ----------------------------------------
+  if (req.method === 'GET') {
+    const customerId = req.query.customer_id
+    // Aquí iría tu lógica real, p.ej.:
+    // const subscribed = await checkSubscription(customerId)
+    // Por ahora devolvemos true como placeholder:
+    const subscribed = true
+    return res.status(200).json({ subscribed })
+  }
+
+  // ----------------------------------------
+  // 2) Manejo de POST para webhooks (ya existente)
+  // ----------------------------------------
   if (req.method !== 'POST') {
-    return res.status(405).end()    // Aquí devolvemos “405 Method Not Allowed”
+    return res.status(405).end()    // Method Not Allowed
   }
 
   // 1) Leer el body crudo
@@ -41,7 +56,7 @@ export default async function handler(req, res) {
   console.log('📬 recibí subscriptionContract:', subscriptionContract)
 
   // TODO: Llama aquí al Admin API para añadir/quitar el tag
-  // por ejemplo, si subscriptionContract.status === 'ACTIVE' -> tagga al customer
+  // por ejemplo, si subscriptionContract.status === 'ACTIVE' -> taggea al customer
 
   // 4) Avisa a Shopify que todo OK
   res.status(200).send('OK')
